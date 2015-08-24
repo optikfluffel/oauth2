@@ -76,6 +76,29 @@ defmodule OAuth2.AccessToken do
   end
 
   @doc """
+  Makes a `DELETE` request to the given URL using the AccessToken.
+  """
+  def delete(token, url, headers \\ [], opts \\ []) do
+    case Request.delete(process_url(token, url), req_headers(token, headers), opts) do
+      {:ok, response} -> {:ok, response.body}
+      {:error, reason} -> {:error, %Error{reason: reason}}
+    end
+  end
+
+  @doc """
+  Makes a `DELETE` request to the given URL using the AccessToken.
+
+  An `OAuth2.Error` exception is raised if the request results in an
+  error tuple (`{:error, reason}`).
+  """
+  def delete!(token, url, headers \\ [], opts \\ []) do
+    case delete(token, url, req_headers(token, headers), opts) do
+      {:ok, response} -> response
+      {:error, error} -> raise error
+    end
+  end
+
+  @doc """
   Determines if the access token expires or not.
 
   Returns `true` unless `expires_at` is `nil`.
